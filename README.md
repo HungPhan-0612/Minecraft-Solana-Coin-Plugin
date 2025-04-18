@@ -51,7 +51,7 @@ git clone https://github.com/HungPhan-0612/Minecraft-Solana-Coin-Plugin.git
 cd MinePathCoinPlugin
 
 # Build it with style
-./gradlew build  # or gradlew.bat build on Windows
+gradlew clean shadowJar
 ```
 
 You’ll find your treasure at:
@@ -137,28 +137,11 @@ external-db:
 
 ---
 
-## 🧪 For Developers
-- Want to fork this project? Go wild! 🎨
-```bash
-git checkout -b feature/your-feature
-```
-- Code is clean, modular, and event-driven.
-- External DB support via JDBC.
-- Plugin gracefully disables itself on config fail.
-
----
-
-## 📜 License
-MIT — You break it, you fix it. You build on it? Go change the world. 🌍
-
----
-
-## 💬 Say Hi
-Open an issue, submit a PR, or just say "Hey devs, you rock!" — we’re here for it 😄
-
----
-
 🧠 Inspiration
-This plugin was inspired by the innovative work on Synex Coin, a Solana utility token designed for integrating crypto into Minecraft. A big shoutout to the Synex for paving the way in merging blockchain technology with
+This plugin was inspired by the innovative work on Synex Coin, a Solana utility token designed for integrating crypto into Minecraft. A big shoutout to the Synex Creator (https://github.com/JIBSIL) for paving the way in merging blockchain technology with
+
+---
 https://www.spigotmc.org/resources/synex-coin-add-real-crypto-to-your-minecraft-server.101696/
+
+---
 https://github.com/JIBSIL/synex-coin
