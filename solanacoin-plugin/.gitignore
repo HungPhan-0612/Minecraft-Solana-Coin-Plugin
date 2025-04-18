@@ -1,0 +1,10 @@
+.gradle
+.idea
+!build/
+build/*
+!build/libs/
+build/libs/*
+!build/libs/*.jar
+.env
+bin/main/
+.vscode

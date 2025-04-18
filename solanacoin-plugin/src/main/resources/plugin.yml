@@ -1,0 +1,114 @@
+  name: MinePath
+  main: com.solanacoin.MinePathCoinPlugin
+  author: HungPhan0612
+  version: 1.0.0
+  api-version: 1.18
+  softdepend:
+    - Vault
+  permissions:
+
+    minepath.*:
+      description: Allows for all commands
+      default: op
+      children:
+        minepath.serverbalance: true
+        minepath.balance: true
+        minepath.db: true
+        minepath.export: true
+        minepath.lbh: true
+        minepath.send: true
+        minepath.admin: true
+
+    minepath.user:
+      description: Allows to check balance, export, and send
+      default: not op
+      children:
+        minepath.db: false
+        minepath.lbh: false
+        minepath.admin: false
+        minepath.serverbalance: true
+        minepath.balance: true
+        minepath.export: true
+        minepath.send: true
+
+  commands:
+
+    serverbalance:
+      description: Check the balance of the server
+      aliases:
+        - ssbalance
+        - csbalance
+        - ssbal
+        - csbal
+      permission: minepath.serverbalance
+      permission-message: You do not have permission!
+      usage: /<command>
+
+    balance:
+      description: Check your balance
+      aliases:
+        - bal
+        - sbalance
+        - cbalance
+        - sbal
+        - cbal
+      permission: minepath.balance
+      permission-message: You do not have permission!
+      usage: /<command>
+
+    db:
+      description: Manage the db connection
+      aliases:
+        - sdb
+        - cdb
+      permission: minepath.db
+      permission-message: You do not have permission!
+      usage: /<command> connect|disconnect|status
+
+    export:
+      description: Export your balance to a Solana wallet address
+      aliases:
+        - sexport
+        - cexport
+      permission: minepath.export
+      permission-message: You do not have permission!
+      usage: /<command> [amount] confirm
+
+    lbh:
+      description: Get the latest blockhash
+      aliases:
+        - slbh
+        - clbh
+      permission: minepath.lbh
+      permission-message: You do not have permission!
+      usage: /<command>
+
+    send:
+      description: Send from your balance to another player
+      aliases:
+        - pay
+        - ssend
+        - csend
+      permission: minepath.send
+      permission-message: You do not have permission!
+      usage: /<command> [player] [amount] confirm
+
+    admin:
+      description: Administrator commands
+      aliases:
+        - sadmin
+        - cadmin
+      permission: minepath.admin
+      permission-message: You do not have permission!
+      usage: |
+             /<command> balance|add|subtract|delete|set|destroydb
+             Example: /<command> add [player] [amount] - add x amount to the player's balance
+             Example: /<command> set [player] [amount] - set the player's balance to x amount
+             Example: /<command> subtract [player] [amount] - subtract x amount from the player's balance
+             |
+             Example: /<command> delete [player] - delete a player from the db
+             Example: /<command> balance - get the server's balance
+             Example: /<command> balance [player] - get a player's balance
+             Example: /<command> reload - reload this plugins' config
+             |
+             Example: /<command> destroydb confirm - delete all entries from the db
