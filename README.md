@@ -84,7 +84,7 @@ vaultEnabled: false
 
 # SQLite (simple & sweet)
 dbType: "sqlite"
-sqliteLocation: "plugins/MinePathCoinPlugin/balance.db"
+sqliteLocation: "plugins/MinePathCoinPlugin/MinePath.db"
 
 # OR External DB (for specific case)
 external-db:
