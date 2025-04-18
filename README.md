@@ -47,7 +47,7 @@ This project uses the **Gradle Wrapper**, so no extra tools needed.
 
 ```bash
 # Clone the repo
-git clone https://github.com/yourorg/MinePathCoinPlugin.git
+git clone https://github.com/HungPhan-0612/Minecraft-Solana-Coin-Plugin.git
 cd MinePathCoinPlugin
 
 # Build it with style
