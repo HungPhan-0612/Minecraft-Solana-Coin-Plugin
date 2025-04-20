@@ -140,7 +140,7 @@ requestLimitPerSecond: 1
 
 ---
 
-🧠 Inspiration
+## 🧠 Inspiration
 This plugin was inspired by the innovative work on Synex Coin, a Solana utility token designed for integrating crypto into Minecraft. A big shoutout to the Synex Creator (https://github.com/JIBSIL) for paving the way in merging blockchain technology with
 
 ---
