@@ -48,7 +48,7 @@ This project uses the **Gradle Wrapper**, so no extra tools needed.
 ```bash
 # Clone the repo
 git clone https://github.com/HungPhan-0612/Minecraft-Solana-Coin-Plugin.git
-cd MinePathCoinPlugin
+cd solanacoin-plugin
 
 # Build it with style
 gradlew clean shadowJar
