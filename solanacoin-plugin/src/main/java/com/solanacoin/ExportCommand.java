@@ -49,7 +49,7 @@ public class ExportCommand implements CommandExecutor {
             dbUser == null || dbUser.isEmpty() || 
             dbPassword == null) {
             
-            plugin.getLogger().severe("External database configuration is missing or incomplete!");
+            plugin.getLogger().severe(ChatColor.RED + "External database configuration is missing or incomplete!");
             databaseConfigured = false;
             plugin.getServer().getPluginManager().disablePlugin(plugin);
             
@@ -74,9 +74,9 @@ public class ExportCommand implements CommandExecutor {
         Connection conn = null;
         try {
             conn = DriverManager.getConnection(externalDbUrl, externalDbUser, externalDbPassword);
-            plugin.getLogger().info("Successfully connected to external database");
+            plugin.getLogger().info(ChatColor.GREEN +"Successfully connected to external database");
         } catch (SQLException e) {
-            plugin.getLogger().severe("Failed to connect to external database: " + e.getMessage());
+            plugin.getLogger().severe(ChatColor.RED + "Failed to connect to external database: " + e.getMessage());
             databaseConfigured = false;
             plugin.getServer().getPluginManager().disablePlugin(plugin);
         } finally {
@@ -95,7 +95,7 @@ public class ExportCommand implements CommandExecutor {
      */
     private String getPlayerWalletAddress(String playerUUID) {
         if (!databaseConfigured) {
-            plugin.getLogger().severe("Cannot get wallet address: Database is not configured");
+            plugin.getLogger().severe(ChatColor.RED + "Cannot get wallet address: Database is not configured");
             return null;
         }
         
@@ -118,7 +118,7 @@ public class ExportCommand implements CommandExecutor {
             rs.close();
             ps.close();
         } catch (SQLException e) {
-            plugin.getLogger().severe("Error connecting to external database: " + e.getMessage());
+            plugin.getLogger().severe(ChatColor.RED + "Error connecting to external database: " + e.getMessage());
             e.printStackTrace();
         } finally {
             if (conn != null) {
