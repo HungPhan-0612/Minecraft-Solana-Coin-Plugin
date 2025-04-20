@@ -1,13 +1,16 @@
 package com.solanacoin;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.entity.Player;
+import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scoreboard.*;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.plugin.java.JavaPlugin;
 import org.p2p.solanaj.core.Account;
 import org.p2p.solanaj.core.PublicKey;
 import org.p2p.solanaj.rpc.types.TokenResultObjects.TokenAmountInfo;
@@ -16,7 +19,11 @@ import org.p2p.solanaj.rpc.Cluster;
 import org.p2p.solanaj.rpc.RpcClient;
 import org.p2p.solanaj.rpc.types.SplTokenAccountInfo;
 
+import java.sql.Connection;
 import java.math.RoundingMode;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.text.NumberFormat;
@@ -131,7 +138,7 @@ public class MinePathCoinPlugin extends JavaPlugin implements Listener {
     }
 
     public void loadSQL() {
-        this.getServer().getConsoleSender().sendMessage(chatPrefix + ChatColor.GRAY + "Loading SQL ahihi");
+        this.getServer().getConsoleSender().sendMessage(chatPrefix + ChatColor.GRAY + "Loading SQL...");
         if (this.db != null) {
             this.db.disconnect();
         }
@@ -149,10 +156,10 @@ public class MinePathCoinPlugin extends JavaPlugin implements Listener {
                         config.getString("dbPassword"),
                         config.getBoolean("dbUseSSL"));
             }
-            this.getServer().getConsoleSender().sendMessage(chatPrefix + ChatColor.GREEN + "Database connected! ahihi");
+            this.getServer().getConsoleSender().sendMessage(chatPrefix + ChatColor.GREEN + "Database connected! Ahihi");
         } catch (SQLException e) {
             e.printStackTrace();
-            this.getServer().getConsoleSender().sendMessage(chatPrefix + ChatColor.RED + "Database connection failed.");
+            this.getServer().getConsoleSender().sendMessage(chatPrefix + ChatColor.RED + "Database connection failed. Oh no!");
         }
     }
 
@@ -190,7 +197,7 @@ public class MinePathCoinPlugin extends JavaPlugin implements Listener {
             getServer().getConsoleSender().sendMessage(chatPrefix+ChatColor.GREEN + "MINEPATH Not Enabled");
         }
 
-
+        startAutoBalanceUpdates();
     }
 
     @Override
@@ -412,7 +419,109 @@ public class MinePathCoinPlugin extends JavaPlugin implements Listener {
 
 
     }
+    private void startAutoBalanceUpdates() {
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                for (Player player : Bukkit.getOnlinePlayers()) {
+                    // Fetch and display the player's wallet balance asynchronously
+                    Bukkit.getScheduler().runTaskAsynchronously(MinePathCoinPlugin.this, () -> {
+                        String balanceStr = "Fetching...";
+                        try {
+                            // Fetch the player's wallet address from the database
+                            String walletAddress = getPlayerWalletAddress(player.getUniqueId().toString());
+                            if (walletAddress != null && !walletAddress.isEmpty()) {
+                                PublicKey wallet = new PublicKey(walletAddress);
 
+                                // Fetch associated token address & balance
+                                PublicKey UserATA = PublicKey.findProgramAddress(
+                                    List.of(
+                                            wallet.toByteArray(),
+                                            org.p2p.solanaj.programs.TokenProgram.PROGRAM_ID.toByteArray(),
+                                            tokenMintAddress.toByteArray()
+                                    ),
+                                    org.p2p.solanaj.programs.AssociatedTokenProgram.PROGRAM_ID
+                                ).getAddress();
+                                TokenAmountInfo balance = rpcClient.getApi().getTokenAccountBalance(UserATA, null);
+                                balanceStr = balance.getUiAmountString();
+                            } else {
+                                balanceStr = "Wallet not linked";
+                            }
+                        } catch (Exception e) {
+                            balanceStr = "No ATA dectected";
+                        }
+
+                        // Update the player's scoreboard with the fetched balance
+                        String finalBalanceStr = balanceStr;
+                        Bukkit.getScheduler().runTask(MinePathCoinPlugin.this, () -> {
+                            updatePlayerScoreboard(player, finalBalanceStr);
+                        });
+                    });
+                }
+            }
+        }.runTaskTimer(this, 0L, 50L);
+    }
+    private String getPlayerWalletAddress(String playerUUID) {
+            String walletAddress = null;
+            Connection conn = null;
+            try {
+                conn = DriverManager.getConnection(
+                        getConfig().getString("external-db.url"),
+                        getConfig().getString("external-db.user"),
+                        getConfig().getString("external-db.password")
+                );
+
+                PreparedStatement ps = conn.prepareStatement(
+                        "SELECT wallet_address FROM walletlogin_wallets WHERE uuid = ?"
+                );
+                ps.setString(1, playerUUID);
+
+                ResultSet rs = ps.executeQuery();
+                if (rs.next()) {
+                    walletAddress = rs.getString("wallet_address");
+                }
+
+                rs.close();
+                ps.close();
+            } catch (SQLException e) {
+                getLogger().severe("Error fetching wallet address: " + e.getMessage());
+                e.printStackTrace();
+            } finally {
+                if (conn != null) {
+                    try {
+                        conn.close();
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+
+            return walletAddress;
+    }
+
+    // Function to update the player's scoreboard with the latest balance
+    private void updatePlayerScoreboard(Player player, String balanceStr) {
+        ScoreboardManager scoreboardManager = Bukkit.getScoreboardManager();
+        Scoreboard scoreboard = player.getScoreboard();
+        Objective objective = scoreboard.getObjective("walletBal");
+
+        // If the objective doesn't exist yet, create it
+        if (objective == null) {
+            scoreboard = scoreboardManager.getNewScoreboard();
+            objective = scoreboard.registerNewObjective("walletBal", "dummy", ChatColor.GOLD + "Your Wallet");
+            objective.setDisplaySlot(DisplaySlot.SIDEBAR);
+            player.setScoreboard(scoreboard);
+        }
+
+        // Reset existing entries (optional: track specific entries for updates)
+        for (String entry : scoreboard.getEntries()) {
+            scoreboard.resetScores(entry);
+        }
+
+        // Add the balance to the sidebar
+        Score score = objective.getScore(ChatColor.GREEN + "Balance: " + ChatColor.YELLOW + balanceStr);
+        score.setScore(0);
+    }
 
 
 }
