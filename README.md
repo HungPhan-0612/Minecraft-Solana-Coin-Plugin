@@ -72,25 +72,28 @@ build/libs/MinePathCoinPlugin.jar
 
 ```yaml
 enabled: true
-rpcURL: "https://api.mainnet-beta.solana.com"  # Or test with Devnet
-signer: "<base58-private-key>"
-publicKey: "<base58-server-wallet>"
-tokenMint: "<base58-token-mint>"
-currencySymbol: "MPC"
-minimumExport: 0.1
-requestLimitPerSecond: 1
-startingBalance: 0.0
-vaultEnabled: false
-
-# SQLite (simple & sweet)
-dbType: "sqlite"(sqlite, mysql, postgresql)
-sqliteLocation: "plugins/MinePathCoinPlugin/MinePath.db"
-
-# OR External DB (for specific case)
+vaultEnabled: true
+sqliteLocation: plugins/MinePath/MinePath.db
+dbType: mysql (sqlite, mysql, postgresql)
+dbHost: localhost
+dbPort: 3306
+dbName: minepath
+dbTable: balance
+dbUsername: root
+dbPassword: 
+dbUseSSL: false
 external-db:
-  url: "jdbc:mysql://host:3306/minecraft"
-  user: "dbuser"
-  password: "dbpassword"
+  url: jdbc:mysql://localhost:3306/....
+  user: root
+  password: 
+tokenMint: 8ukoz8y6bJxpjUVSE3bEDbGjwyStqXBQZiSyxjhjNx1g
+signer: 
+publicKey: 
+rpcURL: https://api.devnet.solana.com
+currencySymbol: MINECRAFT
+startingBalance: 0.0
+minimumExport: 0.5
+requestLimitPerSecond: 1
 ```
 
 ---
