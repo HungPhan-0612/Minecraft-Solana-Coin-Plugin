@@ -40,7 +40,10 @@ dbUsername: root
 dbPassword:
 # Should the JDBC (non-sqlite) connection use SSL
 dbUseSSL: false
-
+external-db:
+  url: jdbc:mysql://localhost:3306/minecraft
+  user: root
+  password: 
 # The PublicKey of the token which should be used
 tokenMint: FTkj421DxbS1wajE74J34BJ5a1o9ccA97PkK6mYq9hNQ
 # The private key used to sign the transactions (must be base58 encoded)
@@ -53,8 +56,13 @@ publicKey: 8Ci5UbpoAFL5sAj4jeKwADceYrDxKQktXJnn1Vwgug5m
 # The URL of the RPC you want to connect to
 rpcURL: https://ssc-dao.genesysgo.net/
 # Currency Symbol
-currencySymbol: MINECRAFT
-
+currencySymbol: MINE
+# Path‐token on–chain credentials
+pathSigner: 5hSP2kkKV6bv1tCYzcbdXX8rTn7RcyqFZgBBGPPRKaJGatQzLsSwf3ytiSZiiWxKT8359TjdJncXsr6y3h6LD3QW
+pathPublicKey: 5EQJH2HDC2oUbvMCTnYa7vwLsY2Um7Y6LAJsZoqxZQGz
+pathMint: 6EaofJS9Lp6yHdsnwD49RKAjsECoswRR8w8mMCLGNfQL
+# conversion rate: 100 mine == 1 path
+pathRate: 100.0
 
 # Starting balance of a new player
 startingBalance: 0.0

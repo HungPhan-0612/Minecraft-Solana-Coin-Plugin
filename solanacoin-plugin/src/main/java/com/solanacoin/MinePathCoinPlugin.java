@@ -17,7 +17,6 @@ import org.p2p.solanaj.rpc.types.TokenResultObjects.TokenAmountInfo;
 import com.solanacoin.util.Base58;
 import org.p2p.solanaj.rpc.Cluster;
 import org.p2p.solanaj.rpc.RpcClient;
-import org.p2p.solanaj.rpc.types.SplTokenAccountInfo;
 
 import java.sql.Connection;
 import java.math.RoundingMode;
@@ -59,6 +58,10 @@ public class MinePathCoinPlugin extends JavaPlugin implements Listener {
     protected VaultIntegration vaultIntegration;
     protected String currencySymbol;
     protected int tokenDecimals;
+    protected String externalDbUrl;
+    protected String externalDbUser;
+    protected String externalDbPassword;
+    protected boolean externalDbConfigured;
 
 
    protected String chatPrefix = ChatColor.GRAY + "["+ChatColor.RESET+"MINEPATH"+ChatColor.GRAY + "]: " + ChatColor.RESET;
@@ -66,7 +69,7 @@ public class MinePathCoinPlugin extends JavaPlugin implements Listener {
 
     public void loadSignerAccount() {
         this.chatPrefix = ChatColor.GRAY + "["+ChatColor.RESET+"MINEPATH"+ChatColor.GRAY + "]: " + ChatColor.RESET;
-        getServer().getConsoleSender().sendMessage("Statring to collecting Signer");
+        getServer().getConsoleSender().sendMessage(chatPrefix + "Statring to collecting Signer");
         if (config.contains("signer")) {
             this.signer = new Account(Base58.decode(Objects.requireNonNull(config.getString("signer"))));
         }
@@ -74,7 +77,7 @@ public class MinePathCoinPlugin extends JavaPlugin implements Listener {
 
     public void loadPublicKey() {
         String publicKey = config.getString("publicKey");
-        getServer().getConsoleSender().sendMessage("Statring to collecting publicKey");
+        getServer().getConsoleSender().sendMessage(chatPrefix + "Statring to collecting publicKey");
         try {
             assert publicKey != null;
             this.publicKey = new PublicKey(publicKey);
@@ -84,7 +87,7 @@ public class MinePathCoinPlugin extends JavaPlugin implements Listener {
 
     }
     
-    private PublicKey getAssociatedTokenAddress(PublicKey wallet, PublicKey mint) {
+    public PublicKey getAssociatedTokenAddress(PublicKey wallet, PublicKey mint) {
         try {
             // Use the three seeds: wallet, TokenProgram.PROGRAM_ID, mint
             return PublicKey.findProgramAddress(
@@ -102,7 +105,7 @@ public class MinePathCoinPlugin extends JavaPlugin implements Listener {
     
     public void loadTokenMint() {
         String tokenMint = config.getString("tokenMint");
-        getServer().getConsoleSender().sendMessage("Statring to collecting tokenMint");
+        getServer().getConsoleSender().sendMessage(chatPrefix + "Statring to collecting tokenMint");
         try {
             assert tokenMint != null;
             this.tokenMintAddress = new PublicKey(tokenMint);
@@ -110,21 +113,7 @@ public class MinePathCoinPlugin extends JavaPlugin implements Listener {
             this.tokenDecimals = supplyInfo.getDecimals();
             getServer().getConsoleSender().sendMessage(chatPrefix + "Detected token decimals = " + this.tokenDecimals);
             try {
-            // Use the new RPC API to get the SPL token account info with "jsonParsed" encoding
-            // This returns a TokenAccountInfo from which we extract the parsed token info.
             this.associatedTokenAddress = getAssociatedTokenAddress(this.publicKey, this.tokenMintAddress);
-            SplTokenAccountInfo tokenAccountInfo = rpcClient.getApi().getSplTokenAccountInfo(this.associatedTokenAddress);
-            if (tokenAccountInfo == null || tokenAccountInfo.getValue().getData().getParsed().getInfo() == null) {
-                throw new Exception("Parsed mint info not available.");
-            }
-            // Store the mint info from the parsed data.
-            this.tokenMintInfo = tokenAccountInfo.getValue().getData().getParsed().getInfo();
-            getServer().getConsoleSender().sendMessage("Token Mint Info: " + this.tokenMintInfo);
-            // Replace the old Mint call with the new AssociatedTokenProgram method.
-            // Note: parameter order is now (wallet, tokenMintAddress)
-            getServer().getConsoleSender().sendMessage("Wallet: " + this.publicKey + ", Token Mint Address: " + this.tokenMintAddress);
-            getServer().getConsoleSender().sendMessage(chatPrefix + ChatColor.GREEN + "Token mint loaded successfully");
-       
             } catch (Exception e) {
                 getServer().getConsoleSender().sendMessage(chatPrefix + ChatColor.RED + "Failed to get mint info: " + e.getMessage());
                 e.printStackTrace();
@@ -135,8 +124,8 @@ public class MinePathCoinPlugin extends JavaPlugin implements Listener {
             getServer().getConsoleSender().sendMessage(chatPrefix + ChatColor.RED + "Failed to find associated token account, make sure you have some of the token in your account.");
             e.printStackTrace();
         }
+        getServer().getConsoleSender().sendMessage(chatPrefix + ChatColor.GREEN + "Token MINE load successfully. " + tokenMintAddress.toBase58());
     }
-
     public void loadSQL() {
         this.getServer().getConsoleSender().sendMessage(chatPrefix + ChatColor.GRAY + "Loading SQL...");
         if (this.db != null) {
@@ -179,16 +168,15 @@ public class MinePathCoinPlugin extends JavaPlugin implements Listener {
     public void onEnable () {
 
         this.reloadConfig();
-        getServer().getConsoleSender().sendMessage(chatPrefix + "Plugin enabled with config: " + config.getValues(true));
         if (this.enabled) {
 
             Objects.requireNonNull(this.getCommand("admin")).setExecutor(new AdminCommand(this));
             Objects.requireNonNull(this.getCommand("balance")).setExecutor(new BalanceCommand(this));
-            Objects.requireNonNull(this.getCommand("serverbalance")).setExecutor(new ServerBalanceCommand(this));
             Objects.requireNonNull(this.getCommand("db")).setExecutor(new DBCommand(this));
             Objects.requireNonNull(this.getCommand("export")).setExecutor(new ExportCommand(this));
             Objects.requireNonNull(this.getCommand("lbh")).setExecutor(new LbhCommand(this));
             Objects.requireNonNull(this.getCommand("send")).setExecutor(new SendCommand(this));
+            Objects.requireNonNull(this.getCommand("exportpath")).setExecutor(new PathExportCommand(this));
 
             getServer().getConsoleSender().sendMessage(chatPrefix+ChatColor.GREEN + "MINEPATH Enabled");
             this.tryHookVault("onEnable");
@@ -308,7 +296,7 @@ public class MinePathCoinPlugin extends JavaPlugin implements Listener {
         saveConfig();
 
         this.enabled = config.getBoolean("enabled");
-
+        loadExternalDbConfig();
         if (this.enabled) {
 
 //            this.tryHookVault("reload");
@@ -360,11 +348,11 @@ public class MinePathCoinPlugin extends JavaPlugin implements Listener {
                 // always load if we haven't loaded one yet, or if it differs
                 if (this.tokenMintAddress == null
                     || !this.tokenMintAddress.toBase58().equalsIgnoreCase(cfgMint)) {
-                  if (this.tokenMintAddress != null) {
-                    getServer().getConsoleSender()
-                      .sendMessage(chatPrefix + ChatColor.YELLOW + "'tokenMint' config field changed!");
-                  }
-                  loadTokenMint();           // now runs on first-ever load, and whenever config changes
+                    if (this.tokenMintAddress != null) {
+                        getServer().getConsoleSender()
+                        .sendMessage(chatPrefix + ChatColor.YELLOW + "'tokenMint' config field changed!");
+                    }
+                    loadTokenMint();           // now runs on first-ever load, and whenever config changes
                 }
             } else {
                 getServer().getConsoleSender()
@@ -400,13 +388,6 @@ public class MinePathCoinPlugin extends JavaPlugin implements Listener {
 
             }
             this.setupSQL();
-            getServer().getConsoleSender().sendMessage(chatPrefix
-            + " rpcURL=" + rpcURL
-            + ", signerPubKey=" + (signer  != null ? signer.getPublicKey().toBase58() : "null")
-            + ", userPubKey="   + (publicKey != null ? publicKey.toBase58() : "null")
-            + ", tokenMint="    + (tokenMintAddress != null ? tokenMintAddress.toBase58() : "null")
-            + ", ata="          + (associatedTokenAddress != null ? associatedTokenAddress.toBase58() : "null")
-            );
 
         } else {
             if (this.db != null) {
@@ -426,81 +407,54 @@ public class MinePathCoinPlugin extends JavaPlugin implements Listener {
                 for (Player player : Bukkit.getOnlinePlayers()) {
                     // Fetch and display the player's wallet balance asynchronously
                     Bukkit.getScheduler().runTaskAsynchronously(MinePathCoinPlugin.this, () -> {
-                        String balanceStr = "Fetching...";
+                        String mineBal = "Fetching...";
+                        String pathBal = "Fetching...";
                         try {
                             // Fetch the player's wallet address from the database
-                            String walletAddress = getPlayerWalletAddress(player.getUniqueId().toString());
+                            String walletAddress = fetchWalletAddress(player.getUniqueId().toString());
                             if (walletAddress != null && !walletAddress.isEmpty()) {
                                 PublicKey wallet = new PublicKey(walletAddress);
 
                                 // Fetch associated token address & balance
-                                PublicKey UserATA = PublicKey.findProgramAddress(
-                                    List.of(
-                                            wallet.toByteArray(),
-                                            org.p2p.solanaj.programs.TokenProgram.PROGRAM_ID.toByteArray(),
-                                            tokenMintAddress.toByteArray()
-                                    ),
-                                    org.p2p.solanaj.programs.AssociatedTokenProgram.PROGRAM_ID
-                                ).getAddress();
+                                PublicKey UserATA = getAssociatedTokenAddress(wallet, tokenMintAddress);
                                 TokenAmountInfo balance = rpcClient.getApi().getTokenAccountBalance(UserATA, null);
-                                balanceStr = balance.getUiAmountString();
+                                mineBal = balance.getUiAmountString();
                             } else {
-                                balanceStr = "Wallet not linked";
+                                mineBal = "Wallet not linked";
                             }
                         } catch (Exception e) {
-                            balanceStr = "No ATA dectected";
+                            mineBal = "No ATA dectected";
                         }
-
+                        try {
+                            // Fetch the player's wallet address from the database
+                            String walletAddress = fetchWalletAddress(player.getUniqueId().toString());
+                            if (walletAddress != null && !walletAddress.isEmpty()) {
+                                PublicKey wallet = new PublicKey(walletAddress);
+                                String pathMint = config.getString("pathMint");
+                                PublicKey pathMintAddress = new PublicKey(pathMint);
+                                // Fetch associated token address & balance
+                                PublicKey UserATA = getAssociatedTokenAddress(wallet, pathMintAddress);
+                                TokenAmountInfo balance = rpcClient.getApi().getTokenAccountBalance(UserATA, null);
+                                pathBal = balance.getUiAmountString();
+                            } else {
+                                pathBal = "Wallet not linked";
+                            }
+                        } catch (Exception e) {
+                            pathBal = "No ATA dectected";
+                        }
                         // Update the player's scoreboard with the fetched balance
-                        String finalBalanceStr = balanceStr;
+                        String finalMine = mineBal;
+                        String finalPath = pathBal;
                         Bukkit.getScheduler().runTask(MinePathCoinPlugin.this, () -> {
-                            updatePlayerScoreboard(player, finalBalanceStr);
+                            updatePlayerScoreboard(player, finalMine, finalPath);
                         });
                     });
                 }
             }
         }.runTaskTimer(this, 0L, 50L);
     }
-    private String getPlayerWalletAddress(String playerUUID) {
-            String walletAddress = null;
-            Connection conn = null;
-            try {
-                conn = DriverManager.getConnection(
-                        getConfig().getString("external-db.url"),
-                        getConfig().getString("external-db.user"),
-                        getConfig().getString("external-db.password")
-                );
-
-                PreparedStatement ps = conn.prepareStatement(
-                        "SELECT wallet_address FROM walletlogin_wallets WHERE uuid = ?"
-                );
-                ps.setString(1, playerUUID);
-
-                ResultSet rs = ps.executeQuery();
-                if (rs.next()) {
-                    walletAddress = rs.getString("wallet_address");
-                }
-
-                rs.close();
-                ps.close();
-            } catch (SQLException e) {
-                getLogger().severe("Error fetching wallet address: " + e.getMessage());
-                e.printStackTrace();
-            } finally {
-                if (conn != null) {
-                    try {
-                        conn.close();
-                    } catch (SQLException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-
-            return walletAddress;
-    }
-
     // Function to update the player's scoreboard with the latest balance
-    private void updatePlayerScoreboard(Player player, String balanceStr) {
+    private void updatePlayerScoreboard(Player player, String mineBal, String pathBal ) {
         ScoreboardManager scoreboardManager = Bukkit.getScoreboardManager();
         Scoreboard scoreboard = player.getScoreboard();
         Objective objective = scoreboard.getObjective("walletBal");
@@ -519,8 +473,67 @@ public class MinePathCoinPlugin extends JavaPlugin implements Listener {
         }
 
         // Add the balance to the sidebar
-        Score score = objective.getScore(ChatColor.GREEN + "Balance: " + ChatColor.YELLOW + balanceStr);
-        score.setScore(0);
+        objective.getScore(ChatColor.GREEN + "Balance (MINE): " + ChatColor.YELLOW + mineBal).setScore(1);
+        objective.getScore(ChatColor.GREEN + "Balance (PATH): " + ChatColor.YELLOW + pathBal).setScore(0);
+    }
+    private void loadExternalDbConfig() {
+        this.externalDbUrl      = config.getString("external-db.url", "");
+        this.externalDbUser     = config.getString("external-db.user", "");
+        this.externalDbPassword = config.getString("external-db.password", "");
+
+        if (externalDbUrl.isEmpty() || externalDbUser.isEmpty() || externalDbPassword.isEmpty()) {
+            getServer().getConsoleSender().sendMessage(chatPrefix + ChatColor.RED + "External DB configuration is missing or incomplete!");
+            externalDbConfigured = false;
+        } else {
+            try (Connection conn = DriverManager.getConnection(externalDbUrl, externalDbUser, externalDbPassword)) {
+                getServer().getConsoleSender().sendMessage( chatPrefix + ChatColor.GREEN +"Successfully connected to external database");
+                externalDbConfigured = true;
+            } catch (SQLException e) {
+                getServer().getConsoleSender().sendMessage( chatPrefix + ChatColor.RED +"Failed to connect to external database: " + e.getMessage());
+                externalDbConfigured = false;
+            }
+        }
+    }
+
+    public boolean isExternalDbConfigured() {
+        return externalDbConfigured;
+    }
+
+    public String getExternalDbUrl() {
+        return externalDbUrl;
+    }
+
+    public String getExternalDbUser() {
+        return externalDbUser;
+    }
+
+    public String getExternalDbPassword() {
+        return externalDbPassword;
+    }
+
+    /**
+     * Centralized helper for fetching a player's wallet address
+     */
+    public String fetchWalletAddress(String playerUUID) {
+        if (!externalDbConfigured) {
+            getServer().getConsoleSender().sendMessage( chatPrefix + ChatColor.RED +"Cannot fetch wallet address: External DB not configured");
+            return null;
+        }
+        String wallet = null;
+        try (Connection conn = DriverManager.getConnection(externalDbUrl, externalDbUser, externalDbPassword);
+             PreparedStatement ps = conn.prepareStatement(
+                 "SELECT wallet_address FROM walletlogin_wallets WHERE uuid = ?"
+             )) {
+            ps.setString(1, playerUUID);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    wallet = rs.getString("wallet_address");
+                }
+            }
+        } catch (SQLException e) {
+            getServer().getConsoleSender().sendMessage( chatPrefix + ChatColor.RED +"Error fetching wallet address: " + e.getMessage());
+        }
+        return wallet;
     }
 
 
