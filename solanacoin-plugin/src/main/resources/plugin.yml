@@ -11,13 +11,13 @@
       description: Allows for all commands
       default: op
       children:
-        minepath.serverbalance: true
         minepath.balance: true
         minepath.db: true
         minepath.export: true
         minepath.lbh: true
         minepath.send: true
         minepath.admin: true
+        minepath.export.path: true
 
     minepath.user:
       description: Allows to check balance, export, and send
@@ -26,24 +26,18 @@
         minepath.db: false
         minepath.lbh: false
         minepath.admin: false
-        minepath.serverbalance: true
         minepath.balance: true
         minepath.export: true
         minepath.send: true
+        minepath.export.path: true
 
   commands:
 
-    serverbalance:
-      description: Check the balance of the server
-      aliases:
-        - ssbalance
-        - csbalance
-        - ssbal
-        - csbal
-      permission: minepath.serverbalance
-      permission-message: You do not have permission!
-      usage: /<command>
-
+    exportpath:
+      description: Export PATH tokens
+      usage: /MINEPATH:exportpath <pathAmount> [confirm]
+      permission: minepath.export.path
+    
     balance:
       description: Check your balance
       aliases:
