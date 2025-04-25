@@ -172,8 +172,6 @@ requestLimitPerSecond: 1
 ## 🧠 Inspiration
 This plugin was inspired by the innovative work on Synex Coin, a Solana utility token designed for integrating crypto into Minecraft. A big shoutout to the Synex Creator (https://github.com/JIBSIL) for paving the way in merging blockchain technology with
 
--
-https://www.spigotmc.org/resources/synex-coin-add-real-crypto-to-your-minecraft-server.101696/
+- https://www.spigotmc.org/resources/synex-coin-add-real-crypto-to-your-minecraft-server.101696/
 
--
-https://github.com/JIBSIL/synex-coin
+- https://github.com/JIBSIL/synex-coin
