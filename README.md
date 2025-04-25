@@ -145,7 +145,7 @@ requestLimitPerSecond: 1
 - **Spigot/Bukkit API** – for plugin command handling, permissions, player events, and scheduler.
 
 ### 💰 Solana Blockchain
-- **[Solanaj](https://github.com/skynetcapital/solanaj)** – Java SDK for interacting with Solana RPC APIs (token transfers, minting, balances).
+- **[Solanaj](https://github.com/skynetcap/solanaj)** – Java SDK for interacting with Solana RPC APIs (token transfers, minting, balances).
 - **Base58 encoding** – for handling Solana address formats.
 
 ### 💾 Database
