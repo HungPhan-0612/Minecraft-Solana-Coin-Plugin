@@ -102,12 +102,12 @@ requestLimitPerSecond: 1
 
 | Command | What it does | Permission |
 |--------|---------------|------------|
-| `/minepath:balance` | See your coin stash | `minepath.balance` |
-| `/minepath:send <player> <amount>` | Send tokens to your buddies | `minepath.send` |
-| `/minepath:export <amount> confirm` | Export to your Solana wallet | `minepath.export` |
-| `/minepath:admin ...` | God mode: adjust balances | `minepath.admin` |
-| `/minepath:db status` | DB health check | `minepath.db` |
-| `/minepath:lbh` | Latest Solana blockhash | `minepath.lbh` |
+| `/minepath:balance` | See your coin stash | `All Users`|
+| `/minepath:send <player> <amount>` | Send tokens to your buddies | `All Users` |
+| `/minepath:export <amount> confirm` | Export to your Solana wallet | `All Users` |
+| `/minepath:admin ...` | God mode: adjust balances | `Only Admin` |
+| `/minepath:db status` | DB health check | `Only Admin`|
+| `/minepath:lbh` | Latest Solana blockhash | `All Users` |
 
 ### Admin Command Menu 📜
 
@@ -120,7 +120,43 @@ requestLimitPerSecond: 1
 /minepath:admin destroydb confirm      # ⚠️ Wipe the DB ⚠️
 /minepath:admin reload                 # Reload config
 ```
+---
 
+## 📦 Commands Overview
+
+### `/minepath`
+- Shows the list of commands available.
+- Output differs based on permission:
+  - Admins see all commands.
+  - Regular users see: `balance`, `export`, `exportpath`, `send`, and `lbh`.
+
+### `/minepath:admin`
+Admin-only operations:
+- `balance [player]` – Get balance of player or server.
+- `add <player> <amount>` – Add balance to player.
+- `subtract <player> <amount>` – Subtract balance from player.
+- `set <player> <amount>` – Set player's balance.
+- `delete <player>` – Remove player from DB.
+- `destroydb confirm` – Permanently deletes DB after confirmation.
+- `reload` – Reloads plugin config.
+
+### `/minepath:balance`
+- For players: shows their own balance.
+- For console: shows server balance.
+
+### `/minepath:send <player> <amount> confirm`
+- Sends tokens from one player to another (requires confirmation).
+- Balance is validated before proceeding.
+
+### `/minepath:export <amount> [confirm]`
+- Exports MINE tokens from plugin DB to linked Solana wallet.
+- Confirmation step ensures no accidental transfers.
+
+### `/minepath:db [connect|disconnect|status]`
+- Manage connection to local or external database.
+
+### `/minepath:lbh`
+- Displays the latest Solana blockhash from RPC.
 ---
 
 ## 🧨 Common Issues & Fixes
