@@ -17,7 +17,8 @@
         minepath.lbh: true
         minepath.send: true
         minepath.admin: true
-        minepath.export.path: true
+        minepath.export.path: false
+        minepath.help: true
 
     minepath.user:
       description: Allows to check balance, export, and send
@@ -29,14 +30,21 @@
         minepath.balance: true
         minepath.export: true
         minepath.send: true
-        minepath.export.path: true
+        minepath.export.path: false
+        minepath.help: true
 
   commands:
 
-    exportpath:
-      description: Export PATH tokens
-      usage: /MINEPATH:exportpath <pathAmount> [confirm]
-      permission: minepath.export.path
+    minepath:
+      description: "Show help for MinePathCoinPlugin commands"
+      usage: /<command>
+      permission: minepath.help
+
+    # exportpath:
+    #   description: Export PATH tokens
+    #   usage: /MINEPATH:exportpath <pathAmount> confirm
+    #   permission: minepath.export.path
+    #   permission-message: You do not have permission!
     
     balance:
       description: Check your balance

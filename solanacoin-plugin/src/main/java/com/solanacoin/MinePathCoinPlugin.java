@@ -163,7 +163,9 @@ public class MinePathCoinPlugin extends JavaPlugin implements Listener {
         super.onLoad();
         this.tryHookVault("onLoad");
     }
-
+    public void sendUsage(CommandSender sender, String usage) {
+        sender.sendMessage(chatPrefix + ChatColor.YELLOW + "Usage: " + ChatColor.WHITE + usage);
+    }
     @Override
     public void onEnable () {
 
@@ -176,7 +178,8 @@ public class MinePathCoinPlugin extends JavaPlugin implements Listener {
             Objects.requireNonNull(this.getCommand("export")).setExecutor(new ExportCommand(this));
             Objects.requireNonNull(this.getCommand("lbh")).setExecutor(new LbhCommand(this));
             Objects.requireNonNull(this.getCommand("send")).setExecutor(new SendCommand(this));
-            Objects.requireNonNull(this.getCommand("exportpath")).setExecutor(new PathExportCommand(this));
+            // Objects.requireNonNull(this.getCommand("exportpath")).setExecutor(new PathExportCommand(this));
+            Objects.requireNonNull(this.getCommand("minepath")).setExecutor(new HelpCommand(this));
 
             getServer().getConsoleSender().sendMessage(chatPrefix+ChatColor.GREEN + "MINEPATH Enabled");
             this.tryHookVault("onEnable");
