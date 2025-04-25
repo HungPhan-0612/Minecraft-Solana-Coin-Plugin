@@ -25,13 +25,13 @@ vaultEnabled: true
 # The location of the sqlite db
 sqliteLocation: plugins/MinePath/MinePath.db
 # The db type (sqlite, mysql, postgresql)
-dbType: sqlite
+dbType: mysql
 # The hostname of the database
 dbHost: localhost
 # The port of the database
 dbPort: 3306
 # The database name (if it doesn't exist the plugin will error out when using non-sqlite dbType)
-dbName: synex
+dbName: minepath
 # The database table
 dbTable: balance
 # The database username
@@ -54,13 +54,13 @@ signer:
 # The PublicKey associated with the signer
 publicKey: 8Ci5UbpoAFL5sAj4jeKwADceYrDxKQktXJnn1Vwgug5m
 # The URL of the RPC you want to connect to
-rpcURL: https://ssc-dao.genesysgo.net/
+rpcURL: 
 # Currency Symbol
 currencySymbol: MINE
 # Path‐token on–chain credentials
-pathSigner: 5hSP2kkKV6bv1tCYzcbdXX8rTn7RcyqFZgBBGPPRKaJGatQzLsSwf3ytiSZiiWxKT8359TjdJncXsr6y3h6LD3QW
-pathPublicKey: 5EQJH2HDC2oUbvMCTnYa7vwLsY2Um7Y6LAJsZoqxZQGz
-pathMint: 6EaofJS9Lp6yHdsnwD49RKAjsECoswRR8w8mMCLGNfQL
+pathSigner: 
+pathPublicKey: 
+pathMint: 
 # conversion rate: 100 mine == 1 path
 pathRate: 100.0
 
