@@ -108,6 +108,7 @@ requestLimitPerSecond: 1
 | `/minepath:admin ...` | God mode: adjust balances | `Only Admin` |
 | `/minepath:db status` | DB health check | `Only Admin`|
 | `/minepath:lbh` | Latest Solana blockhash | `All Users` |
+| `/minepath` | Show List of commands | `All Users` |
 
 ### Admin Command Menu 📜
 
