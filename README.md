@@ -103,7 +103,6 @@ requestLimitPerSecond: 1
 | Command | What it does | Permission |
 |--------|---------------|------------|
 | `/minepath:balance` | See your coin stash | `minepath.balance` |
-| `/minepath:serverbalance` | Peek at the server vault | `minepath.serverbalance` |
 | `/minepath:send <player> <amount>` | Send tokens to your buddies | `minepath.send` |
 | `/minepath:export <amount> confirm` | Export to your Solana wallet | `minepath.export` |
 | `/minepath:admin ...` | God mode: adjust balances | `minepath.admin` |
@@ -137,6 +136,36 @@ requestLimitPerSecond: 1
 
 ❌ **Vault permissions not working?**  
 ➡️ Enable `vaultEnabled: true` and install the Vault plugin + permissions plugin (LuckPerms, etc.)
+
+---
+
+## 🔧 Technologies & Libraries Used
+
+### 🟨 Minecraft / Bukkit
+- **Spigot/Bukkit API** – for plugin command handling, permissions, player events, and scheduler.
+
+### 💰 Solana Blockchain
+- **[Solanaj](https://github.com/skynetcapital/solanaj)** – Java SDK for interacting with Solana RPC APIs (token transfers, minting, balances).
+- **Base58 encoding** – for handling Solana address formats.
+
+### 💾 Database
+- **SQLite** – for local player balance storage.
+- **MySQL/PostgreSQL (External DB)** – optionally configured for syncing player wallet data (e.g. `walletlogin_wallets` table).
+
+### 🧰 Java Libraries & Features
+- **Java NIO** – for byte-level handling of transfer instructions.
+- **Bukkit Scheduler** – for async balance fetching and periodic scoreboard updates.
+- **Java Plugin System** – structure powered by Bukkit plugin framework (`JavaPlugin`).
+
+### 🔐 Permissions & Vault Integration
+- **Vault API (Optional)** – integrated for permission checks if `vaultEnabled: true` in config.
+
+---
+
+## 🧪 Notes
+- Designed for use on Solana **Devnet** or **Mainnet**
+- External DB should include a `walletlogin_wallets` table with `uuid` and `wallet_address`
+- Plugin supports auto scoreboard updates showing both MINE and PATH balances
 
 ---
 
