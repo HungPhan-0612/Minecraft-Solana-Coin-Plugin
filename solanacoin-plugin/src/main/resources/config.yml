@@ -45,14 +45,14 @@ external-db:
   user: root
   password: 
 # The PublicKey of the token which should be used
-tokenMint: FTkj421DxbS1wajE74J34BJ5a1o9ccA97PkK6mYq9hNQ
+tokenMint: 
 # The private key used to sign the transactions (must be base58 encoded)
 # To get this, use the wallet Phantom (https://phantom.app)
 # In phantom, click the settings gear at the bottom of the screen --> click "Export Private Key" --> Copy and paste the text into the "signer" field.
 # This key is never shared and never leaves your server.
 signer:
 # The PublicKey associated with the signer
-publicKey: 8Ci5UbpoAFL5sAj4jeKwADceYrDxKQktXJnn1Vwgug5m
+publicKey: 
 # The URL of the RPC you want to connect to
 rpcURL: 
 # Currency Symbol
