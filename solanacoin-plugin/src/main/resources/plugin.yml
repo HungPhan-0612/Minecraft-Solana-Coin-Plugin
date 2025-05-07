@@ -13,12 +13,14 @@
       children:
         minepath.balance: true
         minepath.db: true
-        minepath.export: true
         minepath.lbh: true
         minepath.send: true
         minepath.admin: true
-        minepath.export.path: false
         minepath.help: true
+        minepath.buy: true
+        minepath.authorize: true
+        minepath.burn: true
+        minepath.claim: true
 
     minepath.user:
       description: Allows to check balance, export, and send
@@ -28,25 +30,36 @@
         minepath.lbh: false
         minepath.admin: false
         minepath.balance: true
-        minepath.export: true
-        minepath.send: true
-        minepath.export.path: false
+        minepath.send: false
         minepath.help: true
+        minepath.buy: false
+        minepath.authorize: true
+        minepath.burn: false
+        minepath.claim: false
 
   commands:
+    tokenclaim:
+      description: Claim the token to your account.
+      permission: minepath.claim
+      permission-message: You do not have permission!
+  
+    tokenauthorize:
+       description: Authorize the session key first time.
+       permission: minepath.authorize
+       permission-message: You do not have permission!
 
-    minepath:
+    tokenburn:
+      description: Burn the token to get the balance in the game.
+      permission: minepath.burn
+      permission-message: You do not have permission!
+      
+    tokenhelp:
       description: "Show help for MinePathCoinPlugin commands"
-      usage: /<command>
       permission: minepath.help
+      usage: /<command>
 
-    # exportpath:
-    #   description: Export PATH tokens
-    #   usage: /MINEPATH:exportpath <pathAmount> confirm
-    #   permission: minepath.export.path
-    #   permission-message: You do not have permission!
     
-    balance:
+    tokenbalance:
       description: Check your balance
       aliases:
         - bal
@@ -58,7 +71,7 @@
       permission-message: You do not have permission!
       usage: /<command>
 
-    db:
+    tokendb:
       description: Manage the db connection
       aliases:
         - sdb
@@ -67,16 +80,7 @@
       permission-message: You do not have permission!
       usage: /<command> connect|disconnect|status
 
-    export:
-      description: Export your balance to a Solana wallet address
-      aliases:
-        - sexport
-        - cexport
-      permission: minepath.export
-      permission-message: You do not have permission!
-      usage: /<command> [amount] confirm
-
-    lbh:
+    tokenlbh:
       description: Get the latest blockhash
       aliases:
         - slbh
@@ -85,7 +89,7 @@
       permission-message: You do not have permission!
       usage: /<command>
 
-    send:
+    tokensend:
       description: Send from your balance to another player
       aliases:
         - pay
@@ -94,8 +98,11 @@
       permission: minepath.send
       permission-message: You do not have permission!
       usage: /<command> [player] [amount] confirm
-
-    admin:
+    tokenbuy:
+      permission: minepath.buy
+      permission-message: You do not have permission!
+      usage: /<command> [amount] confirm
+    tokenadmin:
       description: Administrator commands
       aliases:
         - sadmin
@@ -105,12 +112,7 @@
       usage: |
              /<command> balance|add|subtract|delete|set|destroydb
              Example: /<command> add [player] [amount] - add x amount to the player's balance
-             Example: /<command> set [player] [amount] - set the player's balance to x amount
-             Example: /<command> subtract [player] [amount] - subtract x amount from the player's balance
-             |
-             Example: /<command> delete [player] - delete a player from the db
-             Example: /<command> balance - get the server's balance
+             Example: /<command> balance - get the your's balance
              Example: /<command> balance [player] - get a player's balance
              Example: /<command> reload - reload this plugins' config
-             |
              Example: /<command> destroydb confirm - delete all entries from the db
