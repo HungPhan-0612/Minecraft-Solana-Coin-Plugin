@@ -113,12 +113,16 @@ public class BurnCommand implements CommandExecutor {
         reader.close();
 
         if (code != 200) {
+          if (code == 402) {
+            throw new IllegalStateException("Session needs funding! Please add SOL.");
+          }
+          if(code == 500){
+            throw new IllegalStateException("Exceed the balance.");
+          }
             // propagate the server error
-            throw new RuntimeException("Burn failed (HTTP " + code + "): " + resp);
+          throw new RuntimeException("Burn failed (HTTP " + code + "): " + resp);
         }
-        if (code == 402) {
-          throw new IllegalStateException("Session needs funding! Please re-authorize to add SOL.");
-        }
+
         // 6) Parse JSON for txid
         JSONObject json = (JSONObject) new JSONParser().parse(resp);
         return (String) json.get("txid");

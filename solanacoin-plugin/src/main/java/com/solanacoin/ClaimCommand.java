@@ -127,10 +127,11 @@ public class ClaimCommand implements CommandExecutor {
         reader.close();
 
         // 5) handle errors
-        if (code == 402) {
-            throw new IllegalStateException("Session needs funding! Please re-authorize to add SOL.");
-        }
+
         if (code != 200) {
+            if (code == 402) {
+                throw new IllegalStateException("Session needs funding! Please add SOL.");
+            }
             throw new RuntimeException("Claim failed (HTTP " + code + "): " + resp);
         }
 
