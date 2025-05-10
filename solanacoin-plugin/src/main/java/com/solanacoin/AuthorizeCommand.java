@@ -34,8 +34,7 @@ public class AuthorizeCommand implements CommandExecutor {
             new PublicKey(userPubkey), plugin.tokenMintAddress).toBase58();
         String sessionPub = plugin.db.getSessionPublicKey(p.getUniqueId().toString());
         if(sessionPub != null){
-            p.sendMessage(ChatColor.RED + "You have already authorized. Here your sessionID: "+ sessionPub + ". Please confirm with the link above if you havent. If you already confirm then you can ignore this message.");
-            plugin.sendCopyableTextToPlayer(p,null, sessionPub, null);
+            plugin.sendCopyableTextToPlayer(p,"You have already authorized. Here your sessionID: "+ sessionPub, sessionPub, TELLRAWCOLOR.green);
             return true;
         }
         try {
