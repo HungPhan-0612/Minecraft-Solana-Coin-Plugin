@@ -33,7 +33,7 @@ public class BurnCommand implements CommandExecutor {
   
       String amount = args[0];
       try {
-        URL url = new URL("http://"+plugin.ipAddress+":"+plugin.port+"/session/burn");
+        URL url = new URL(plugin.linkweb+"/session/burn");
         HttpURLConnection con = (HttpURLConnection) url.openConnection();
         con.setRequestMethod("POST");
         con.setDoOutput(true);
@@ -90,7 +90,7 @@ public class BurnCommand implements CommandExecutor {
         String userATA = plugin.getAssociatedTokenAddress(pubkey, plugin.tokenMintAddress).toBase58();
 
         // 3) Prepare the HTTP POST
-        URL url = new URL("http://"+plugin.ipAddress+":"+plugin.port+"/session/burn");
+        URL url = new URL(plugin.linkweb+"/session/burn");
         HttpURLConnection con = (HttpURLConnection) url.openConnection();
         con.setRequestMethod("POST");
         con.setDoOutput(true);

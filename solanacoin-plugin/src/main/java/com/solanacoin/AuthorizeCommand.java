@@ -38,7 +38,7 @@ public class AuthorizeCommand implements CommandExecutor {
             return true;
         }
         try {
-            URL url = new URL("http://"+plugin.ipAddress+":"+plugin.port+"/session/new");
+            URL url = new URL(plugin.linkweb+"/session/new");
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
             con.setRequestMethod("POST");
             con.setDoOutput(true);
@@ -64,7 +64,7 @@ public class AuthorizeCommand implements CommandExecutor {
             plugin.db.addSession(p.getUniqueId().toString(), sessionId);
             // Gửi link để user ký (có thể qua chat)
             String url_send = String.format(
-                  "http://"+plugin.ipAddress+":"+plugin.port+"/approve?sessionId=%s&userATA=%s",
+                  plugin.linkweb+"/approve?sessionId=%s&userATA=%s",
             sessionId,
                 URLEncoder.encode(userATA, "UTF-8")
                 );
