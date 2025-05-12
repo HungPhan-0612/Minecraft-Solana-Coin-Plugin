@@ -39,7 +39,7 @@ public class ClaimCommand implements CommandExecutor {
         String amount = args[0];
         try {
             // build the POST to /session/claim
-            URL url = new URL("http://"+plugin.ipAddress+":"+plugin.port+"/session/claim");
+            URL url = new URL(plugin.linkweb+"/session/claim");
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
             con.setRequestMethod("POST");
             con.setDoOutput(true);
@@ -103,7 +103,7 @@ public class ClaimCommand implements CommandExecutor {
         ).toBase58();
 
         // 3) build HTTP POST to your backend
-        URL url = new URL("http://"+plugin.ipAddress+":"+plugin.port+"/session/claim");
+        URL url = new URL(plugin.linkweb+"/session/claim");
         HttpURLConnection con = (HttpURLConnection) url.openConnection();
         con.setRequestMethod("POST");
         con.setDoOutput(true);

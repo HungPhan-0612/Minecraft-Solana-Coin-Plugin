@@ -63,22 +63,29 @@ public class MinePathCoinPlugin extends JavaPlugin implements Listener {
     protected int tokenDecimals;
     protected String ipAddress;
     protected String port;
+    protected String linkweb;
 
     protected String chatPrefix = ChatColor.GRAY + "["+ChatColor.RESET+"MINEPATH"+ChatColor.GRAY + "]: " + ChatColor.RESET;
 
 
     public void loadWeb() {
-        this.ipAddress = config.getString("ipAddress");
-        if (this.ipAddress == null) {
-            getServer().getConsoleSender().sendMessage(chatPrefix + ChatColor.RED + "Config field 'ipAddress' missing.");
+        // this.ipAddress = config.getString("ipAddress");
+        // if (this.ipAddress == null) {
+        //     getServer().getConsoleSender().sendMessage(chatPrefix + ChatColor.RED + "Config field 'ipAddress' missing.");
+        // } else {
+        //     getServer().getConsoleSender().sendMessage(chatPrefix + "IP Address: " + this.ipAddress);
+        // }
+        // this.port = config.getString("port");
+        // if (this.port == null) {
+        //     getServer().getConsoleSender().sendMessage(chatPrefix + ChatColor.RED + "Config field 'port' missing.");
+        // } else {
+        //     getServer().getConsoleSender().sendMessage(chatPrefix + "Port: " + this.port);
+        // }
+        this.linkweb = config.getString("linkweb");
+        if (this.linkweb == null) {
+            getServer().getConsoleSender().sendMessage(chatPrefix + ChatColor.RED + "Config field 'linkweb' missing.");
         } else {
-            getServer().getConsoleSender().sendMessage(chatPrefix + "IP Address: " + this.ipAddress);
-        }
-        this.port = config.getString("port");
-        if (this.port == null) {
-            getServer().getConsoleSender().sendMessage(chatPrefix + ChatColor.RED + "Config field 'port' missing.");
-        } else {
-            getServer().getConsoleSender().sendMessage(chatPrefix + "Port: " + this.port);
+            getServer().getConsoleSender().sendMessage(chatPrefix + "Linkweb: " + this.linkweb);
         }
     }
     public void loadSignerAccount() {
